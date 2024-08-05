@@ -103,44 +103,31 @@ photo-sharing-platform/
 Here are the SQL comments for your database schema:
 
 ```sql
--- Users Table
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY, -- User ID
-    username VARCHAR(50) NOT NULL,     -- Username
-    password VARCHAR(255) NOT NULL,    -- Password (hashed)
-    email VARCHAR(100) NOT NULL,       -- User email
-    profile_pic VARCHAR(255),          -- Profile picture filename
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Account creation timestamp
-    UNIQUE(email)
+--Accounts Table
+CREATE TABLE accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL
 );
 
 -- Photos Table
 CREATE TABLE photos (
-    id INT AUTO_INCREMENT PRIMARY KEY, -- Photo ID
-    user_id INT NOT NULL,              -- Foreign key to users table
-    filename VARCHAR(255) NOT NULL,    -- Filename of the photo
-    title VARCHAR(100),                -- Title of the photo
-    description TEXT,                  -- Description of the photo
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when photo was uploaded
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    filename VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES accounts(id)
 );
 
 -- Followers Table
 CREATE TABLE followers (
-    id INT AUTO_INCREMENT PRIMARY KEY, -- Record ID
-    follower_id INT NOT NULL,          -- ID of the user who follows
-    followee_id INT NOT NULL,          -- ID of the user being followed
-    FOREIGN KEY (follower_id) REFERENCES users(id),
-    FOREIGN KEY (followee_id) REFERENCES users(id),
-    UNIQUE(follower_id, followee_id)   -- Ensure no duplicate follow relationships
+    follower_id INT NOT NULL,
+    followee_id INT NOT NULL,
+    PRIMARY KEY (follower_id, followee_id),
+    FOREIGN KEY (follower_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (followee_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
--- Sessions Table (Optional for user sessions)
-CREATE TABLE sessions (
-    id INT AUTO_INCREMENT PRIMARY KEY, -- Session ID
-    user_id INT NOT NULL,              -- User ID
-    session_token VARCHAR(255) NOT NULL, -- Session token
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Session creation timestamp
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 ```
