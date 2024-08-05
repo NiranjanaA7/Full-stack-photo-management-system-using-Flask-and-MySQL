@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap">
+    <style>
+        body {
+            font-family: 'Gloria Hallelujah', cursive;
+            background-color: #8b5939;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            width: 100%;
+            background-color: #8b5939;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar {
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .user-icon img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .auth-form {
+            background: #8b5939; 
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(225, 218, 218, 0.436); /* Slightly darker shadow for contrast */
+            max-width: 400px;
+            margin: 50px auto; /* Centers the form horizontally and adds top margin */
+            text-align: center;
+        }
+
+        .auth-form h1 {
+            margin-bottom: 20px;
+        }
+
+        .auth-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-form label {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .auth-form input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .auth-form button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #a0ddfb;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Gloria Hallelujah', cursive;
+        }
+
+        .auth-form button:hover {
+            background-color: #555;
+        }
+
+        .auth-form p {
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="user-icon">
+                <a href="{{ url_for('register') }}">
+                    <img src="{{ url_for('static', filename='usericon.png') }}" alt="User">
+                </a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="auth-form">
+            <h1>Login</h1>
+            <form method="POST" action="{{ url_for('login') }}">
+                <label for="username">Your Nickname:</label>
+                <input type="text" name="username" id="username" required>
+                <label for="password">Your Access Key:</label>
+                <input type="password" name="password" id="password" required>
+                <button type="submit">Welcome In</button>
+                <p>{{ msg }}</p>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

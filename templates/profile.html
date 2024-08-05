@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap">
+    <style>
+        body {
+            margin: 0;
+            font-family:'Gloria Hallelujah', cursive;
+            background-color: #8b5939;
+            color: #fff;
+        }
+
+        .profile-header {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .profile-header h1 {
+            margin: 10px 0;
+        }
+
+        .follow-button {
+            background-color:#a0ddfb;
+            border: none;
+            color: rgb(0, 0, 0);
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 10px;
+            font-family: 'Gloria Hallelujah', cursive;
+        }
+
+        .follow-button:hover {
+            background-color:#a0ddfb;
+        }
+
+        .photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .photo {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            overflow: hidden;
+            width: 250px;
+            color: #333;
+            position: relative;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .photo img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .photo img.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            z-index: 1000;
+            cursor: zoom-out;
+            background-color: rgba(0, 0, 0, 0.9);
+            opacity: 1 !important;
+        }
+
+        .photo p {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .download-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .no-images {
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-header">
+        <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="User" onerror="this.src='{{ url_for('static', filename='usericon.png') }}'">
+
+        <h1>{{ user.username }}</h1>
+        {% if session.loggedin %}
+            {% if session.id != user.id %}
+                {% if is_following(session.id, user.id) %}
+                    <form action="{{ url_for('unfollow', followee_id=user.id) }}" method="post">
+                        <button type="submit" class="follow-button">Wave Bye-Bye</button>
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('follow', followee_id=user.id) }}" method="post">
+                        <button type="submit" class="follow-button">Join the Fun</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <a href="{{ url_for('login') }}" class="follow-button">Log In to Be a Buddy</a>
+        {% endif %}
+    </div>
+
+    <div class="photo-grid">
+        {% if images %}
+            {% for image in images %}
+                <div class="photo">
+                    <img src="{{ url_for('static', filename='images/' ~ image.filename) }}" alt="{{ image.title }}" ondblclick="toggleFullscreen(this)">
+                    <a href="javascript:void(0);" class="download-btn" onclick="promptAndDownloadPolaroid('{{ url_for('static', filename='images/' ~ image.filename) }}', '{{ image.title }}')">⬇</a>
+                    <p>{{ image.title }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-images">
+                <p>Oops! No Pics</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleFullscreen(img) {
+            if (img.classList.contains('fullscreen')) {
+                img.classList.remove('fullscreen');
+                document.body.style.overflow = 'auto';
+            } else {
+                img.classList.add('fullscreen');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function promptAndDownloadPolaroid(imageUrl, defaultTitle) {
+            const userTitle = prompt("Enter the text you want to display on the Polaroid frame:", defaultTitle);
+            if (userTitle !== null) {
+                downloadPolaroid(imageUrl, userTitle);
+            }
+        }
+
+        function downloadPolaroid(imageUrl, title) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = function() {
+                const imgPadding = 20;
+                const textPadding = 50;
+                const textHeight = 30;
+                const polaroidWidth = img.width + imgPadding * 2;
+                const polaroidHeight = img.height + imgPadding + textPadding + textHeight;
+                canvas.width = polaroidWidth;
+                canvas.height = polaroidHeight;
+
+                context.fillStyle = '#fff';
+                context.fillRect(0, 0, polaroidWidth, polaroidHeight);
+
+                context.drawImage(img, imgPadding, imgPadding);
+
+                context.fillStyle = '#000';
+                context.font = '20px "Gloria Hallelujah"';
+                context.textAlign = 'center';
+                context.fillText(title, polaroidWidth / 2, img.height + imgPadding + textPadding / 2);
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL();
+                link.download = `${title}_polaroid.png`;
+                link.click();
+            };
+
+            img.src = imageUrl;
+        }
+    </script>
+</body>
+</html>
