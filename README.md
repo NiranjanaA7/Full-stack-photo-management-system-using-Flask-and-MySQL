@@ -1,7 +1,8 @@
 # Full-stack-photo-management-system-using-Flask-and-MySQL
+
 ## Overview
 
-This is a simple photo sharing platform built using Flask and MySQL. Users can upload, view, and manage photos, as well as follow other users. The platform supports user authentication, profile management, and search functionality.
+This is a simple photo sharing platform built using Flask and MySQL. Users can upload, view, and manage photos, as well as follow other users. The platform supports user authentication, profile management, search functionality, and allows users to download images as Polaroids with customized text.
 
 ## Features
 
@@ -11,6 +12,7 @@ This is a simple photo sharing platform built using Flask and MySQL. Users can u
 - **Follow/Unfollow:** Follow or unfollow other users.
 - **Search:** Search for users and photos based on keywords.
 - **Photo Management:** Edit and delete uploaded photos.
+- **Download as Polaroid:** Download photos as Polaroid-style images with customizable text.
 - **Account Deletion:** Delete user accounts and all associated data.
 
 ## Requirements
@@ -92,20 +94,53 @@ photo-sharing-platform/
     ├── search.html         # Search results page template
     ├── upload.html         # Photo upload page template
     ├── edit_profile.html   # Profile editing page template
-    └── edit_image.html     # Image editing page template
+    ├── edit_image.html     # Image editing page template
+    └── download.html       # Polaroid download page template (if applicable)
 ```
 
-## Contributing
+## SQL Schema
 
-Feel free to fork the repository and submit pull requests. Please ensure to follow the existing code style and include tests for new features.
+Here are the SQL comments for your database schema:
 
-## License
+```sql
+-- Users Table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- User ID
+    username VARCHAR(50) NOT NULL,     -- Username
+    password VARCHAR(255) NOT NULL,    -- Password (hashed)
+    email VARCHAR(100) NOT NULL,       -- User email
+    profile_pic VARCHAR(255),          -- Profile picture filename
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Account creation timestamp
+    UNIQUE(email)
+);
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+-- Photos Table
+CREATE TABLE photos (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- Photo ID
+    user_id INT NOT NULL,              -- Foreign key to users table
+    filename VARCHAR(255) NOT NULL,    -- Filename of the photo
+    title VARCHAR(100),                -- Title of the photo
+    description TEXT,                  -- Description of the photo
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when photo was uploaded
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
-## Contact
+-- Followers Table
+CREATE TABLE followers (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- Record ID
+    follower_id INT NOT NULL,          -- ID of the user who follows
+    followee_id INT NOT NULL,          -- ID of the user being followed
+    FOREIGN KEY (follower_id) REFERENCES users(id),
+    FOREIGN KEY (followee_id) REFERENCES users(id),
+    UNIQUE(follower_id, followee_id)   -- Ensure no duplicate follow relationships
+);
 
-For any questions or issues, please contact [your-email@example.com](mailto:your-email@example.com).
+-- Sessions Table (Optional for user sessions)
+CREATE TABLE sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- Session ID
+    user_id INT NOT NULL,              -- User ID
+    session_token VARCHAR(255) NOT NULL, -- Session token
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Session creation timestamp
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 ```
-
-You can paste this directly into your README file. Adjust the placeholders as needed!
