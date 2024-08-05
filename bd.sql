@@ -18,3 +18,13 @@ CREATE TABLE photos (
     filename VARCHAR(255) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES accounts(id)
 );
+
+CREATE TABLE followers (
+    follower_id INT NOT NULL,
+    followee_id INT NOT NULL,
+    PRIMARY KEY (follower_id, followee_id),
+    FOREIGN KEY (follower_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (followee_id) REFERENCES accounts(id) ON DELETE CASCADE
+);
+
+
