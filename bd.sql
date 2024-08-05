@@ -1,7 +1,7 @@
 create database rkive;
 USE rkive;
 show databases;
-select * from accounts;
+
 
 CREATE TABLE accounts (
     id INT AUTO_INCREMENT PRIMARY KEY,
